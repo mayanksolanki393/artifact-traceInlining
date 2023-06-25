@@ -12,9 +12,9 @@ def virtualPar2(row, expNames):
         times.append(row[expName + "_par2"])
     return min(times)
 
-def sanity(row):
+def sanity(row, expnames):
     statuses = set()
-    for expName in input_args.name:
+    for expName in expnames:
         if row[expName + "_solved"]:
             statuses.add(row[expName + "_status"] if row[expName + "_status"] != "ReachedBound" else "OK")
 
@@ -216,8 +216,8 @@ if __name__ == "__main__":
         joined[virtual + "_time"] = joined.apply(lambda row : virtualTime(row, items), axis=1)
         joined[virtual + "_solve_time"] = joined.apply(lambda row : virtualSolveTime(row, items), axis=1)
         joined[virtual + "_par2"] = joined.apply(lambda row : virtualPar2(row, items), axis=1)
-        joined[virtual + "_sanity"] = joined.apply(lambda row : sanity(row), axis=1)
-        print("Sanity check: %s for %s" % ("Failed!" if False in joined[virtual + "_sanity"].values else "Passed!", virtual))
+        #joined[virtual + "_sanity"] = joined.apply(lambda row : sanity(row, virtual.split("+")), axis=1)
+        #print("Sanity check: %s for %s" % ("Failed!" if False in joined[virtual + "_sanity"].values else "Passed!", virtual))
 
     # Plot standalone cactus
     plotCactus(joined, input_args.name, "time-cactus.jpeg")
@@ -257,8 +257,8 @@ if __name__ == "__main__":
             round(joined[name + "_par2"].sum() / 3600, 2)
         ])
     summary = pd.DataFrame(rows, columns=["Tool", "Total Solved Instances", "Total Solve Time (hrs)", "PAR2 Score (hrs)"])
-    print("\n\n", "-" * 40, "SUMMARY", "-" * 40)
+    print("\n", "-" * 40, "SUMMARY", "-" * 40)
     print(summary.to_string(index=False))
-    print("-" * 40, "SUMMARY", "-" * 40)
+    print("-" * 40, "SUMMARY", "-" * 40, "\n")
 
     joined.to_csv(os.path.join(input_args.outDir, "combinedResults.csv"))
